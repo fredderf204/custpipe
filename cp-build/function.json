@@ -1,0 +1,35 @@
+{
+  "bindings": [
+    {
+      "name": "myQueueItem",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "custpipe1",
+      "connection": "custpipe_STORAGE"
+    },
+    {
+      "type": "table",
+      "name": "inputTable",
+      "tableName": "custpipe",
+      "partitionKey": "{partitionKey}",
+      "rowKey": "{rowKey}",
+      "connection": "custpipe_STORAGE",
+      "direction": "in"
+    },
+    {
+      "type": "queue",
+      "name": "outputQueueItem",
+      "queueName": "custpipe2",
+      "connection": "custpipe_STORAGE",
+      "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "outputTable",
+      "tableName": "custpipe",
+      "connection": "custpipe_STORAGE",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}

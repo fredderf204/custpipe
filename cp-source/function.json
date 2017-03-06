@@ -1,0 +1,37 @@
+{
+  "bindings": [
+    {
+      "type": "httpTrigger",
+      "direction": "in",
+      "webHookType": "github",
+      "name": "req"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    {
+      "type": "queue",
+      "name": "outputQueueItem",
+      "queueName": "custpipe1",
+      "connection": "custpipe_STORAGE",
+      "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "outputTable",
+      "tableName": "custpipe",
+      "connection": "custpipe_STORAGE",
+      "direction": "out"
+    },
+    {
+      "type": "table",
+      "name": "inputTable",
+      "tableName": "custpipe",
+      "connection": "custpipe_STORAGE",
+      "direction": "in"
+    }
+  ],
+  "disabled": false
+}
