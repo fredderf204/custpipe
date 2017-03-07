@@ -1,7 +1,7 @@
 {
-  "name": "cp-source",
+  "name": "cp-build",
   "version": "1.0.0",
-  "description": "source stage",
+  "description": "build stage",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,8 +17,14 @@
   },
   "homepage": "https://github.com/fredderf204/custpipe#readme",
   "dependencies": {
-    "moment-timezone": "^0.5.11",
+    "async": "^2.1.5",
+    "azure-arm-resource": "^1.6.1-preview",
+    "azure-storage": "^2.1.0",
+    "fs": "0.0.1-security",
+    "ms-rest-azure": "^1.15.6",
+    "node-fetch": "^1.6.3",
+    "path": "^0.12.7",
     "request": "^2.80.0",
-    "uuid": "^3.0.1"
+    "util": "^0.10.3"
   }
 }
