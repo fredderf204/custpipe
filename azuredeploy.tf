@@ -33,26 +33,26 @@ resource "azurerm_storage_account" "custpipesa" {
 
 #Create a Azure Storage Table
 resource "azurerm_storage_table" "custpipetb" {
-  name                 = "custpipedev"
+  name                 = "custpipe"
   resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
   storage_account_name = "${azurerm_storage_account.custpipesa.name}"
 }
 
 #Create 3 Azure Storage Queues
 resource "azurerm_storage_queue" "custpipeq1" {
-  name                 = "custpipedev1"
+  name                 = "custpipe1"
   resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
   storage_account_name = "${azurerm_storage_account.custpipesa.name}"
 }
 
 resource "azurerm_storage_queue" "custpipeq2" {
-  name                 = "custpipedev2"
+  name                 = "custpipe2"
   resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
   storage_account_name = "${azurerm_storage_account.custpipesa.name}"
 }
 
 resource "azurerm_storage_queue" "custpipeq3" {
-  name                 = "custpipedev3"
+  name                 = "custpipe3"
   resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
   storage_account_name = "${azurerm_storage_account.custpipesa.name}"
 }
@@ -63,11 +63,14 @@ resource "azurerm_template_deployment" "custpipearm" {
   resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
   parameters          = {
       appName = "custpipedev"
-
+      repoURL = "https://github.com/fredderf204/custpipe.git"
+      branch = "master"
+      cpStorageAccountName = "${azurerm_storage_account.custpipesa.name}"
+      cpStorageKey = "${azurerm_storage_account.custpipesa.primary_access_key}" 
   }
 
   template_body = <<DEPLOY
-    {
+{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
@@ -77,25 +80,36 @@ resource "azurerm_template_deployment" "custpipearm" {
                 "description": "The name of the function app that you wish to create."
             }
         },
-        "storageAccountType": {
+        "repoURL": {
             "type": "string",
-            "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS",
-                "Standard_ZRS",
-                "Premium_LRS"
-            ],
             "metadata": {
-                "description": "Storage Account type"
+                "description": "The URL to the GitHub repo"
+            }
+        },
+        "branch": {
+            "type": "string",
+            "metadata": {
+                "description": "The branch name of the GitHub repo"
+            }
+        },
+        "cpStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the custpipe storage account"
+            }
+
+        },
+        "cpStorageKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The primary access key for you custpipe storage account"
             }
         }
     },
     "variables": {
-        "functionAppName": "[parameters('appName')]",
-        "hostingPlanName": "[parameters('appName')]",
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
-        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "cpstorageconnstring": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('cpStorageAccountName'), ';AccountKey=', parameters('cpStorageKey')"
     },
     "resources": [
         {
@@ -104,16 +118,16 @@ resource "azurerm_template_deployment" "custpipearm" {
             "apiVersion": "2015-06-15",
             "location": "[resourceGroup().location]",
             "properties": {
-                "accountType": "[parameters('storageAccountType')]"
+                "accountType": "Standard_LRS"
             }
         },
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2015-04-01",
-            "name": "[variables('hostingPlanName')]",
+            "name": "[parameters('appName')]",
             "location": "[resourceGroup().location]",
             "properties": {
-                "name": "[variables('hostingPlanName')]",
+                "name": "[parameters('appName')]",
                 "computeMode": "Dynamic",
                 "sku": "Dynamic"
             }
@@ -121,15 +135,15 @@ resource "azurerm_template_deployment" "custpipearm" {
         {
             "apiVersion": "2015-08-01",
             "type": "Microsoft.Web/sites",
-            "name": "[variables('functionAppName')]",
+            "name": "[parameters('appName')]",
             "location": "[resourceGroup().location]",
             "kind": "functionapp",            
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appName'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -146,7 +160,7 @@ resource "azurerm_template_deployment" "custpipearm" {
                         },
                         {
                             "name": "WEBSITE_CONTENTSHARE",
-                            "value": "[toLower(variables('functionAppName'))]"
+                            "value": "[toLower(parameters('appName'))]"
                         },
                         {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -155,13 +169,34 @@ resource "azurerm_template_deployment" "custpipearm" {
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "6.5.0"
+                        },
+                        {
+                            "name": "custpipe_STORAGE",
+                            "value": "[variables('cpstorageconnstring')]"
                         }
                     ]
                 }
-            }          
+            },
+                "resources": [
+                {
+                    "apiVersion": "2015-08-01",
+                    "name": "web",
+                    "type": "sourcecontrols",
+                    "dependsOn": [
+                    "[resourceId('Microsoft.Web/serverfarms', parameters('appName'))]",
+                    "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                    ],
+                    "properties": {
+                    "RepoUrl": "[parameters('repoURL')]",
+                    "branch": "[parameters('branch')]",
+                    "IsManualIntegration": false
+                }
+            }
+        ]          
         }
     ]
-    }
+}
+
 DEPLOY
 
   deployment_mode = "Incremental"

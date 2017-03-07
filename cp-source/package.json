@@ -1,0 +1,24 @@
+{
+  "name": "cp-source",
+  "version": "1.0.0",
+  "description": "mini ci/cd pipline using functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fredderf204/custpipe.git"
+  },
+  "author": "michael friedrich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fredderf204/custpipe/issues"
+  },
+  "homepage": "https://github.com/fredderf204/custpipe#readme",
+  "dependencies": {
+    "moment-timezone": "^0.5.11",
+    "request": "^2.80.0",
+    "uuid": "^3.0.1"
+  }
+}
