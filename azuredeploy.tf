@@ -109,7 +109,7 @@ resource "azurerm_template_deployment" "custpipearm" {
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
         "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "cpstorageconnstring": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('cpStorageAccountName'), ';AccountKey=', parameters('cpStorageKey')"
+        "cpstorageconnstring": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('cpStorageAccountName'), ';AccountKey=', parameters('cpStorageKey'))]"
     },
     "resources": [
         {
