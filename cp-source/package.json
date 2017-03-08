@@ -18,7 +18,7 @@
   "homepage": "https://github.com/fredderf204/custpipe#readme",
   "dependencies": {
     "moment-timezone": "^0.5.11",
-    "request": "^2.80.0",
-    "uuid": "^3.0.1"
+    "node-uuid": "^1.4.7",
+    "request": "^2.80.0"
   }
 }
