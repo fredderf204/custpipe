@@ -24,6 +24,7 @@
     "ms-rest-azure": "^1.15.6",
     "node-fetch": "^1.6.3",
     "path": "^0.12.7",
+    "randomstring": "^1.1.5",
     "request": "^2.80.0",
     "util": "^0.10.3"
   }
