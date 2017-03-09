@@ -2,4 +2,4 @@
 Mini Delivery Pipeline using Azure Functions
 
 # Notes
-Build trigger
+trigger another build
