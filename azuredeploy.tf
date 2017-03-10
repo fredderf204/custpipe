@@ -68,11 +68,11 @@ resource "azurerm_template_deployment" "custpipearm" {
     branch                = "master"
     cpStorageAccountName  = "${azurerm_storage_account.custpipesa.name}"
     cpStorageKey          = "${azurerm_storage_account.custpipesa.primary_access_key}"
-    CLIENT_ID             = "${}"
+    CLIENT_ID             = "${var.CLIENT_ID}"
     DOMAIN                = "mfriedrich.cloud"
-    APPLICATION_SECRET    = "${}"
-    AZURE_SUBSCRIPTION_ID = "${}"
-    whurl                 = "${}"
+    APPLICATION_SECRET    = "${var.APPLICATION_SECRET}"
+    AZURE_SUBSCRIPTION_ID = "${var.AZURE_SUBSCRIPTION_ID}"
+    whurl                 = "${var.whurl}"
   }
 
   template_body = <<DEPLOY
@@ -212,23 +212,23 @@ resource "azurerm_template_deployment" "custpipearm" {
                         },
                         {
                             "name": "CLIENT_ID",
-                            "value": "[variables('CLIENT_ID')]"
+                            "value": "[parameters('CLIENT_ID')]"
                         },
                         {
                             "name": "DOMAIN",
-                            "value": "[variables('DOMAIN')]"
+                            "value": "[parameters('DOMAIN')]"
                         },
                         {
                             "name": "APPLICATION_SECRET",
-                            "value": "[variables('APPLICATION_SECRET')]"
+                            "value": "[parameters('APPLICATION_SECRET')]"
                         },
                         {
                             "name": "AZURE_SUBSCRIPTION_ID",
-                            "value": "[variables('AZURE_SUBSCRIPTION_ID')]"
+                            "value": "[parameters('AZURE_SUBSCRIPTION_ID')]"
                         },
                         {
                             "name": "whurl",
-                            "value": "[variables('whurl')]"
+                            "value": "[parameters('whurl')]"
                         }               
                     ]
                 }
