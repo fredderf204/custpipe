@@ -60,13 +60,19 @@ resource "azurerm_storage_queue" "custpipeq3" {
 #Create Azure Function via ARM Template deployment
 resource "azurerm_template_deployment" "custpipearm" {
   name                = "terraformdeploy"
-  resource_group_name  = "${azurerm_resource_group.custpiperg.name}"
-  parameters          = {
-      appName = "custpipedev"
-      repoURL = "https://github.com/fredderf204/custpipe.git"
-      branch = "master"
-      cpStorageAccountName = "${azurerm_storage_account.custpipesa.name}"
-      cpStorageKey = "${azurerm_storage_account.custpipesa.primary_access_key}" 
+  resource_group_name = "${azurerm_resource_group.custpiperg.name}"
+
+  parameters = {
+    appName               = "custpipedev"
+    repoURL               = "https://github.com/fredderf204/custpipe.git"
+    branch                = "master"
+    cpStorageAccountName  = "${azurerm_storage_account.custpipesa.name}"
+    cpStorageKey          = "${azurerm_storage_account.custpipesa.primary_access_key}"
+    CLIENT_ID             = "${}"
+    DOMAIN                = "mfriedrich.cloud"
+    APPLICATION_SECRET    = "${}"
+    AZURE_SUBSCRIPTION_ID = "${}"
+    whurl                 = "${}"
   }
 
   template_body = <<DEPLOY
@@ -103,6 +109,36 @@ resource "azurerm_template_deployment" "custpipearm" {
             "type": "string",
             "metadata": {
                 "description": "The primary access key for you custpipe storage account"
+            }
+        },
+        "CLIENT_ID": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principle ID"
+            }
+        },
+        "DOMAIN": {
+            "type": "string",
+            "metadata": {
+                "description": "DOmain for the Service Principle to sign into"
+            }
+        },
+        "APPLICATION_SECRET": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principle Secret"
+            }
+        },
+        "AZURE_SUBSCRIPTION_ID": {
+            "type": "string",
+            "metadata": {
+                "description": "ID of the target Azure Subscription"
+            }
+        },
+        "whurl": {
+            "type": "string",
+            "metadata": {
+                "description": "Microsoft teams channel webhook addresses"
             }
         }
     },
@@ -173,7 +209,27 @@ resource "azurerm_template_deployment" "custpipearm" {
                         {
                             "name": "custpipe_STORAGE",
                             "value": "[variables('cpstorageconnstring')]"
-                        }
+                        },
+                        {
+                            "name": "CLIENT_ID",
+                            "value": "[variables('CLIENT_ID')]"
+                        },
+                        {
+                            "name": "DOMAIN",
+                            "value": "[variables('DOMAIN')]"
+                        },
+                        {
+                            "name": "APPLICATION_SECRET",
+                            "value": "[variables('APPLICATION_SECRET')]"
+                        },
+                        {
+                            "name": "AZURE_SUBSCRIPTION_ID",
+                            "value": "[variables('AZURE_SUBSCRIPTION_ID')]"
+                        },
+                        {
+                            "name": "whurl",
+                            "value": "[variables('whurl')]"
+                        }               
                     ]
                 }
             },
