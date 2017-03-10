@@ -68,11 +68,11 @@ resource "azurerm_template_deployment" "custpipearm" {
     branch                = "master"
     cpStorageAccountName  = "${azurerm_storage_account.custpipesa.name}"
     cpStorageKey          = "${azurerm_storage_account.custpipesa.primary_access_key}"
-    CLIENT_ID             = "${var.CLIENT_ID}"
+    CLIENT_ID             = "$${ARM_CLIENT_ID}"
     DOMAIN                = "mfriedrich.cloud"
-    APPLICATION_SECRET    = "${var.APPLICATION_SECRET}"
-    AZURE_SUBSCRIPTION_ID = "${var.AZURE_SUBSCRIPTION_ID}"
-    whurl                 = "${var.whurl}"
+    APPLICATION_SECRET    = "$${ARM_CLIENT_SECRET}"
+    AZURE_SUBSCRIPTION_ID = "$${ARM_SUBSCRIPTION_ID}"
+    whurl                 = "$${whurl}"
   }
 
   template_body = <<DEPLOY
