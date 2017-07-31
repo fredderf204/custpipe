@@ -10,8 +10,8 @@ module.exports = function (context, data) {
     var branch = data.ref.substring(11);
     var commitedby = data.head_commit.committer.name;
     var ghmess = data.head_commit.message;
-    var mess = 'Project Name: ' + projectname + '\nBranch: ' + branch + '\nCommitted By: ' + commitedby + '\nGitHub Message: ' + ghmess
-    context.bindings.outputQueueItemNotify = {mess};
+    var mess = 'Project Name: ' + projectname + '\nBranch: ' + branch + '\nCommitted By: ' + commitedby + '\nGitHub Message: ' + ghmess;
+    context.bindings.outputQueueItemnotify = mess;
     context.bindings.outputTable = {
         "partitionKey": projectname,
         "rowKey": rowKey,
