@@ -13,17 +13,61 @@
             "metadata": {
                 "description": "The URL to the GitHub repo"
             }
-    },
+        },
         "branch": {
             "type": "string",
             "metadata": {
                 "description": "The branch name of the GitHub repo"
             }
-    }
+        },
+        "cpStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the custpipe storage account"
+            }
+
+        },
+        "cpStorageKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The primary access key for you custpipe storage account"
+            }
+        },
+        "CLIENT_ID": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principle ID"
+            }
+        },
+        "DOMAIN": {
+            "type": "string",
+            "metadata": {
+                "description": "DOmain for the Service Principle to sign into"
+            }
+        },
+        "APPLICATION_SECRET": {
+            "type": "string",
+            "metadata": {
+                "description": "Service Principle Secret"
+            }
+        },
+        "AZURE_SUBSCRIPTION_ID": {
+            "type": "string",
+            "metadata": {
+                "description": "ID of the target Azure Subscription"
+            }
+        },
+        "whurl": {
+            "type": "string",
+            "metadata": {
+                "description": "Microsoft teams channel webhook addresses"
+            }
+        }
     },
     "variables": {
         "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'azfunctions')]",
-        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+        "storageAccountid": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+        "cpstorageconnstring": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('cpStorageAccountName'), ';AccountKey=', parameters('cpStorageKey'))]"
     },
     "resources": [
         {
@@ -83,7 +127,31 @@
                         {
                             "name": "WEBSITE_NODE_DEFAULT_VERSION",
                             "value": "6.5.0"
-                        }
+                        },
+                        {
+                            "name": "custpipe_STORAGE",
+                            "value": "[variables('cpstorageconnstring')]"
+                        },
+                        {
+                            "name": "CLIENT_ID",
+                            "value": "[parameters('CLIENT_ID')]"
+                        },
+                        {
+                            "name": "DOMAIN",
+                            "value": "[parameters('DOMAIN')]"
+                        },
+                        {
+                            "name": "APPLICATION_SECRET",
+                            "value": "[parameters('APPLICATION_SECRET')]"
+                        },
+                        {
+                            "name": "AZURE_SUBSCRIPTION_ID",
+                            "value": "[parameters('AZURE_SUBSCRIPTION_ID')]"
+                        },
+                        {
+                            "name": "whurl",
+                            "value": "[parameters('whurl')]"
+                        }               
                     ]
                 }
             },
@@ -106,4 +174,3 @@
         }
     ]
 }
-
