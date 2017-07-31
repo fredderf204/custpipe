@@ -1,3 +1,4 @@
+'use strict';
 var uuid = require('node-uuid');
 var request = require('request');
 var moment = require('moment-timezone');
@@ -9,23 +10,9 @@ module.exports = function (context, data) {
     var branch = data.ref.substring(11);
     var commitedby = data.head_commit.committer.name;
     var ghmess = data.head_commit.message;
-    var whurl = process.env.whurl;
-    var whjson = {
-        "title": 'Build Triggered ;)',
-        "text": 'Project Name: ' + projectname + '\nBranch: ' + branch + '\nCommitted By: ' + commitedby + '\nGitHub Message: ' + ghmess,
-        "themeColor": "EA4300"
-    };
-    request.post(
-        whurl,
-        {
-            json: whjson
-        },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                context.log(body);
-            }
-        }
-    );
+    context.bindings.outputQueueItemNotify = JSON.stringify({
+        "text": 'Project Name: ' + projectname + '\nBranch: ' + branch + '\nCommitted By: ' + commitedby + '\nGitHub Message: ' + ghmess
+    });
     context.bindings.outputTable = {
         "partitionKey": projectname,
         "rowKey": rowKey,

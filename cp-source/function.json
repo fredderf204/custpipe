@@ -19,6 +19,13 @@
       "direction": "out"
     },
     {
+      "type": "queue",
+      "name": "outputQueueItemnotify",
+      "queueName": "notify",
+      "connection": "custpipe_STORAGE",
+      "direction": "out"
+    },
+    {
       "type": "table",
       "name": "outputTable",
       "tableName": "custpipe",
