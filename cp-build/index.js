@@ -10,6 +10,7 @@ var ResourceManagementClient = require('azure-arm-resource').ResourceManagementC
 var fetch = require('node-fetch');
 var request = require('request');
 var azure = require('azure-storage');
+var uuid = require('node-uuid');
 module.exports = function (context, myQueueItem) {
     context.log('function triggered by item in the queue: ', myQueueItem);
     var clientId = process.env.CLIENT_ID;
@@ -28,40 +29,20 @@ module.exports = function (context, myQueueItem) {
     process.env['buildurl'] = buildurl;
     var templateuri = 'https://raw.githubusercontent.com/fredderf204/ARMTemplates/master/webapp_github/azuredeploy.json';
     var whurl = process.env.whurl;
-    var whjson = {
-        "title": 'Build Started ;)',
-        "text": 'Project Name:' + projname + '\nBranch: ' + branch + '\nARM Template: ' + templateuri + '\nResourceGroup: ' + resourceName,
-        "themeColor": "EA4300"
-    };
+    var mess0 = 'Build Started ;) \n\nProject Name:' + projname + '\n\nBranch: ' + branch + '\n\nARM Template: ' + templateuri + '\n\nResourceGroup: ' + resourceName;
+    var rowKey = uuid.v1();
     context.log(resourceName);
     //send webhook 1
-    request.post(
-        whurl,
-        {
-            json: whjson
-        },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                context.log(body);
-            }
-        }
-    );
+    context.bindings.outputQueueItemNotify = mess0;
     //update table 1
     var status = "azure build started";
     var buildstarttime = new Date();
-    var builditem = {
-        "PartitionKey": { '_': myQueueItem.partitionKey },
-        "RowKey": { '_': myQueueItem.rowKey },
-        "status": { '_': status },
-        "buildstarttime": { '_': buildstarttime }
-    };
-    process.env['AZURE_STORAGE_CONNECTION_STRING'] = process.env.custpipe_STORAGE;
-    var tableSvc = azure.createTableService();
-    tableSvc.mergeEntity('custpipe', builditem, function (error, result, response) {
-        if (!error) {
-            context.log("Entity updated");
-        }
-    });
+    context.bindings.outputTable = {
+        "partitionKey": myQueueItem.partitionKey,
+        "rowKey": rowKey,
+        "status": status,
+        "buildstarttime": buildstarttime
+    }
     //build in azure
     msRestAzure.loginWithServicePrincipalSecret(clientId, secret, domain, function (err, credentials) {
         if (err) return context.log(err);
@@ -87,42 +68,20 @@ module.exports = function (context, myQueueItem) {
                 });
             },
             function (callback) {
-                //send notifications and update table
-                var buildendtime = new Date();
                 //update table 2
+                var buildendtime = new Date();
                 var status2 = "azure build completed";
-                var builditem2 = {
-                    "PartitionKey": { '_': myQueueItem.partitionKey },
-                    "RowKey": { '_': myQueueItem.rowKey },
-                    "status": { '_': status2 },
-                    "buildendtime": { '_': buildendtime },
-                    "buildrname": { '_': resourceName },
-                    "buildurl": { '_': 'http://' + resourceName + '.azurewebsites.net' }
-                };
-                process.env['AZURE_STORAGE_CONNECTION_STRING'] = process.env.custpipe_STORAGE;
-                var tableSvc = azure.createTableService();
-                tableSvc.mergeEntity('custpipe', builditem2, function (error, result, response) {
-                    if (!error) {
-                        context.log("Entity updated second time");
-                    }
-                });
+                context.bindings.outputTable = {
+                    "partitionKey": myQueueItem.partitionKey,
+                    "rowKey": rowKey,
+                    "status": status2,
+                    "buildendtime": buildendtime,
+                    "buildrname": resourceName,
+                    "buildurl": 'http://' + resourceName + '.azurewebsites.net'
+                }
                 //send webhook 2
-                var whjson2 = {
-                    "title": 'Build completed ;)',
-                    "text": 'Project Name:' + projname + '\nBranch: ' + branch + '\nResourceGroup: ' + resourceName + '\nBuildURL: http://' + resourceName + '.azurewebsites.net',
-                    "themeColor": "EA4300"
-                };
-                request.post(
-                    whurl,
-                    {
-                        json: whjson2
-                    },
-                    function (error, response, body) {
-                        if (!error && response.statusCode == 200) {
-                            //context.log(body);
-                        }
-                    }
-                );
+                var mess1 = 'Build completed ;) \n\nProject Name:' + projname + '\n\nBranch: ' + branch + '\n\nResourceGroup: ' + resourceName + '\n\nBuildURL: http://' + resourceName + '.azurewebsites.net'
+                context.bindings.outputQueueItemNotify = mess1;
                 //send message to queue
                 context.bindings.outputQueueItem = JSON.stringify({
                     "partitionKey": projname,
