@@ -27,7 +27,9 @@ module.exports = function (context, data) {
     context.bindings.outputQueueItem = JSON.stringify({
         "partitionKey": projectname,
         "rowKey": rowKey,
-        "status": status
+        "status": status,
+        "repourl": data.repository.html_url,
+        "branch": branch,
     });
     context.res = { body: 'New GitHub comment: ' + ghmess };
     context.done();

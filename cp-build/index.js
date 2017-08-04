@@ -20,10 +20,10 @@ module.exports = function (context, myQueueItem) {
     var resourceClient;
     var randomIds = randomstring.generate({ length: 4, charset: 'alphabetic' });
     var location = 'australia east';
-    var projname = context.bindings.inputTable.partitionKey;
+    var projname = context.bindings.myQueueItem.partitionKey;
     var deploymentName = 'custpipe';
-    var repoURL = context.bindings.inputTable.repourl;
-    var branch = context.bindings.inputTable.branch;
+    var repoURL = context.bindings.myQueueItem.repourl;
+    var branch = context.bindings.myQueueItem.branch;
     var resourceName = randomIds + projname + branch;
     var buildurl = 'http://' + resourceName + '.azurewebsites.net';
     process.env['buildurl'] = buildurl;
