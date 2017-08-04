@@ -38,7 +38,7 @@ module.exports = function (context, myQueueItem) {
     var status = "azure build started";
     var buildstarttime = new Date();
     context.bindings.outputTable = {
-        "partitionKey": myQueueItem.partitionKey,
+        "partitionKey": projname,
         "rowKey": rowKey,
         "status": status,
         "buildstarttime": buildstarttime
@@ -72,7 +72,7 @@ module.exports = function (context, myQueueItem) {
                 var buildendtime = new Date();
                 var status2 = "azure build completed";
                 context.bindings.outputTable = {
-                    "partitionKey": myQueueItem.partitionKey,
+                    "partitionKey": projname,
                     "rowKey": rowKey,
                     "status": status2,
                     "buildendtime": buildendtime,
