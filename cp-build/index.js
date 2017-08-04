@@ -20,7 +20,7 @@ module.exports = function (context, myQueueItem) {
     var resourceClient;
     var randomIds = randomstring.generate({ length: 4, charset: 'alphabetic' });
     var location = 'australia east';
-    var projname = context.bindings.inputTable.PartitionKey;
+    var projname = context.bindings.inputTable.partitionKey;
     var deploymentName = 'custpipe';
     var repoURL = context.bindings.inputTable.repourl;
     var branch = context.bindings.inputTable.branch;
